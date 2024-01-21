@@ -13,16 +13,17 @@ terraform {
 
 # Credentials to each cloud provider go below
 provider "google" {
-  # export GOOGLE_CREDENTIALS=keys/terraform-runner_key.json 
-  project = "esoteric-cab-411900"
-  region  = "us-central1"
+  # export GOOGLE_CREDENTIALS=keys/terraform-runner_key.json
+  credentials = file(var.credentials)
+  project     = var.project
+  region      = var.location
 }
 
 # A resource block corresponds to a product in the cloud
 # Args: a product type ("google_storage_bucket") and custom name ("demo-bucket").
 resource "google_storage_bucket" "demo-bucket" {
-  name          = "esoteric-cab-411900"
-  location      = "US"
+  name          = var.gcs_bucket_name
+  location      = var.location
   force_destroy = true
 
   lifecycle_rule {
@@ -34,4 +35,9 @@ resource "google_storage_bucket" "demo-bucket" {
       type = "AbortIncompleteMultipartUpload"
     }
   }
+}
+
+resource "google_bigquery_dataset" "demo_dataset" {
+  dataset_id = var.bq_dataset_name
+  location   = var.location
 }
